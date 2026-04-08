@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { Suspense, lazy, useLayoutEffect, useState } from 'react';
+import { Navigate, Route, BrowserRouter as Router, Routes, useLocation } from 'react-router-dom';
+
+
+// Systems Operations
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './assets/styles/index.css';
 
 function App() {
   const [count, setCount] = useState(0)
