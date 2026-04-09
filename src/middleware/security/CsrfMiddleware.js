@@ -13,7 +13,8 @@
  * Backend manages the HTTP-only secret cookie automatically.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1/';
+const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1/";
 
 class CsrfMiddleware {
     constructor() {
@@ -105,7 +106,12 @@ class CsrfMiddleware {
             clearTimeout(this._refreshTimer);
             this._refreshTimer = null;
         }
-        return this._refreshToken();
+        try {
+            return await this._refreshToken();
+        } catch {
+            // Refresh POST failed (token already invalid) — fall back to GET
+            return this._fetchToken();
+        }
     }
 
     /**
@@ -145,10 +151,14 @@ class CsrfMiddleware {
             : null;
         return {
             hasToken: !!this._token,
-            tokenPreview: this._token ? `${this._token.substring(0, 8)}...` : null,
+            tokenPreview: this._token
+                ? `${this._token.substring(0, 8)}...`
+                : null,
             isInitialized: this._isInitialized,
             tokenExpiresAt: this._tokenExpiresAt,
-            timeUntilExpirySeconds: timeUntilExpiry ? Math.floor(timeUntilExpiry / 1000) : null,
+            timeUntilExpirySeconds: timeUntilExpiry
+                ? Math.floor(timeUntilExpiry / 1000)
+                : null,
             hasRefreshTimer: !!this._refreshTimer,
             retryCount: this._retryCount,
         };
@@ -188,38 +198,45 @@ class CsrfMiddleware {
         for (let attempt = 0; attempt <= this._maxRetries; attempt++) {
             try {
                 const response = await fetch(`${API_BASE_URL}csrf/token`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    throw new Error(
+                        `HTTP ${response.status}: ${response.statusText}`,
+                    );
                 }
 
                 const data = await response.json();
                 if (!data.success || !data.token) {
-                    throw new Error(data.message || 'No token in response');
+                    throw new Error(data.message || "No token in response");
                 }
 
                 this._token = data.token;
                 this._lastFetchTime = Date.now();
                 this._retryCount = 0;
 
-                if (data.expiresIn) this._tokenExpiry = Date.now() + data.expiresIn;
+                if (data.expiresIn)
+                    this._tokenExpiry = Date.now() + data.expiresIn;
                 if (data.expiresAt) this._tokenExpiresAt = data.expiresAt;
 
                 if (data.refreshIn && data.refreshIn > 0) {
                     this._scheduleRefresh(data.refreshIn);
                 } else if (data.expiresIn) {
-                    this._scheduleRefresh(Math.max(0, data.expiresIn - this._refreshBeforeExpiry));
+                    this._scheduleRefresh(
+                        Math.max(0, data.expiresIn - this._refreshBeforeExpiry),
+                    );
                 }
 
                 return data.token;
             } catch (err) {
                 this._retryCount = attempt + 1;
                 if (attempt === this._maxRetries) {
-                    throw new Error(`CSRF fetch failed after ${this._maxRetries + 1} attempts: ${err.message}`);
+                    throw new Error(
+                        `CSRF fetch failed after ${this._maxRetries + 1} attempts: ${err.message}`,
+                    );
                 }
                 await this._sleep(this._retryDelay * Math.pow(2, attempt));
             }
@@ -231,31 +248,41 @@ class CsrfMiddleware {
 
         this._refreshPromise = (async () => {
             try {
+                const headers = { "Content-Type": "application/json" };
+                if (this._token) headers["x-csrf-token"] = this._token;
+
                 const response = await fetch(`${API_BASE_URL}csrf/refresh`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: "POST",
+                    credentials: "include",
+                    headers,
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    throw new Error(
+                        `HTTP ${response.status}: ${response.statusText}`,
+                    );
                 }
 
                 const data = await response.json();
                 if (!data.success || !data.token) {
-                    throw new Error(data.message || 'Refresh returned no token');
+                    throw new Error(
+                        data.message || "Refresh returned no token",
+                    );
                 }
 
                 this._token = data.token;
                 this._lastFetchTime = Date.now();
 
-                if (data.expiresIn) this._tokenExpiry = Date.now() + data.expiresIn;
+                if (data.expiresIn)
+                    this._tokenExpiry = Date.now() + data.expiresIn;
                 if (data.expiresAt) this._tokenExpiresAt = data.expiresAt;
 
                 if (data.refreshIn && data.refreshIn > 0) {
                     this._scheduleRefresh(data.refreshIn);
                 } else if (data.expiresIn) {
-                    this._scheduleRefresh(Math.max(0, data.expiresIn - this._refreshBeforeExpiry));
+                    this._scheduleRefresh(
+                        Math.max(0, data.expiresIn - this._refreshBeforeExpiry),
+                    );
                 }
 
                 this._notifyListeners();
@@ -290,7 +317,11 @@ class CsrfMiddleware {
 
     _notifyListeners() {
         this._listeners.forEach((cb) => {
-            try { cb(this._token); } catch { /* ignore listener errors */ }
+            try {
+                cb(this._token);
+            } catch {
+                /* ignore listener errors */
+            }
         });
     }
 
