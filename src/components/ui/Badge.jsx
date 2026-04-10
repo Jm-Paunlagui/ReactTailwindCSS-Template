@@ -1,60 +1,113 @@
 /**
- * Badge.jsx — Status badge / pill component.
+ * Badge — Status pill / label.
  *
  * Props:
- *   variant — 'green' | 'red' | 'warning' | 'blue' | 'purple' | 'cyan' | 'amber' | 'grey'
- *   dot     — boolean (show pulse dot)
- *   size    — 'sm' | 'md'
+ *   variant  — 'green'|'red'|'warning'|'blue'|'purple'|'cyan'|'amber'|'grey'|'orange'
+ *   size     — 'xs'|'sm'|'md'
+ *   dot      — boolean (animated pulse dot)
+ *   outline  — boolean (border-only style)
+ *   removable — boolean (× button)
+ *   onRemove — () => void
+ *   pill     — boolean (rounded-full instead of rounded-lg)
  *   children
  */
-
-const VARIANTS = {
-    green: "text-success-400 bg-success-100/60 border-success-400/30",
-    red: "text-danger-400  bg-danger-100      border-danger-400/30",
-    warning: "text-warn-400    bg-warn-100/20     border-warn-400/30",
-    blue: "text-blue-400    bg-blue-100/25     border-blue-400/30",
-    purple: "text-purple-400  bg-purple-100/28   border-purple-400/35",
-    cyan: "text-turquoise-400 bg-turquoise-100/22 border-turquoise-400/25",
-    amber: "text-yellow-400  bg-yellow-100      border-yellow-400/30",
-    grey: "text-grey-500    bg-grey-100        border-grey-400/30",
-    orange: "text-orange-400  bg-orange-100/20   border-orange-400/30",
+const V = {
+    green: {
+        solid: "text-success-400 bg-success-100/60 border-success-400/30",
+        outline: "text-success-500 border-success-400 bg-transparent",
+        dot: "bg-success-400",
+    },
+    red: {
+        solid: "text-danger-400  bg-danger-100      border-danger-400/30",
+        outline: "text-danger-500  border-danger-400  bg-transparent",
+        dot: "bg-danger-400",
+    },
+    warning: {
+        solid: "text-warn-600    bg-warn-100/30     border-warn-400/30",
+        outline: "text-warn-600    border-warn-400    bg-transparent",
+        dot: "bg-warn-400",
+    },
+    blue: {
+        solid: "text-blue-500    bg-blue-100/30     border-blue-400/30",
+        outline: "text-blue-500    border-blue-400    bg-transparent",
+        dot: "bg-blue-400",
+    },
+    purple: {
+        solid: "text-purple-400  bg-purple-100/25   border-purple-400/35",
+        outline: "text-purple-500  border-purple-400  bg-transparent",
+        dot: "bg-purple-400",
+    },
+    cyan: {
+        solid: "text-turquoise-500 bg-turquoise-100/22 border-turquoise-400/25",
+        outline: "text-turquoise-500 border-turquoise-400 bg-transparent",
+        dot: "bg-turquoise-400",
+    },
+    amber: {
+        solid: "text-yellow-600  bg-yellow-100      border-yellow-400/30",
+        outline: "text-yellow-600  border-yellow-400  bg-transparent",
+        dot: "bg-yellow-400",
+    },
+    grey: {
+        solid: "text-grey-500    bg-grey-100        border-grey-400/30",
+        outline: "text-grey-500    border-grey-400    bg-transparent",
+        dot: "bg-grey-400",
+    },
+    orange: {
+        solid: "text-orange-500  bg-orange-100/20   border-orange-400/30",
+        outline: "text-orange-500  border-orange-400  bg-transparent",
+        dot: "bg-orange-400",
+    },
 };
 
-const DOT_COLORS = {
-    green: "bg-success-400   ring-success-400/30",
-    red: "bg-danger-400    ring-danger-400/30",
-    warning: "bg-warn-400      ring-warn-400/30",
-    blue: "bg-blue-400      ring-blue-400/30",
-    purple: "bg-purple-400    ring-purple-400/30",
-    cyan: "bg-turquoise-400 ring-turquoise-400/30",
-    amber: "bg-yellow-400    ring-yellow-400/30",
-    grey: "bg-grey-400      ring-grey-400/30",
-    orange: "bg-orange-400    ring-orange-400/30",
+const SZ = {
+    xs: "px-1.5 py-0.5 text-xs gap-1",
+    sm: "px-2   py-0.5 text-xs gap-1",
+    md: "px-2.5 py-1   text-xs gap-1.5",
 };
 
-export default function Badge({
+export function Badge({
     variant = "grey",
-    dot = false,
     size = "md",
+    dot = false,
+    outline = false,
+    removable = false,
+    onRemove,
+    pill = false,
     children,
 }) {
-    const sizeClass =
-        size === "sm" ? "px-2 py-0.5 text-xs" : "px-2.5 py-1 text-xs";
+    const cfg = V[variant] ?? V.grey;
+    const style = outline ? cfg.outline : cfg.solid;
 
     return (
         <span
-            className={`inline-flex items-center gap-1.5 font-aumovio-bold tracking-wide
-                rounded-lg border shadow-sm
-                ${VARIANTS[variant] ?? VARIANTS.grey}
-                ${sizeClass}`}
+            className={`inline-flex items-center font-aumovio-bold tracking-wide
+      border shadow-sm ${pill ? "rounded-full" : "rounded-lg"}
+      ${style} ${SZ[size] ?? SZ.md}`}
         >
             {dot && (
                 <span
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ring-2 animate-pulse
-                        ${DOT_COLORS[variant] ?? DOT_COLORS.grey}`}
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 animate-pulse ${cfg.dot}`}
                 />
             )}
             {children}
+            {removable && (
+                <button
+                    onClick={onRemove}
+                    aria-label="Remove"
+                    className="ml-0.5 hover:opacity-70"
+                >
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                        <path
+                            d="M8 2L2 8M2 2l6 6"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </button>
+            )}
         </span>
     );
 }
+
+export default Badge;

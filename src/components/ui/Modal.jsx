@@ -1,14 +1,16 @@
 /**
- * Modal.jsx — Accessible modal dialog.
+ * Modal — Accessible dialog overlay.
  *
  * Props:
- *   open      — boolean
- *   onClose   — () => void
- *   title     — string
- *   size      — 'sm' | 'md' | 'lg' | 'xl'  (default: 'md')
+ *   open     — boolean
+ *   onClose  — () => void
+ *   title    — string
+ *   size     — 'sm'|'md'|'lg'|'xl'|'2xl'|'full'
+ *   variant  — 'default'|'danger'|'success'
+ *   footer   — ReactNode
  *   children
  */
-
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
 
 const SIZES = {
@@ -16,26 +18,37 @@ const SIZES = {
     md: "max-w-md",
     lg: "max-w-lg",
     xl: "max-w-2xl",
+    "2xl": "max-w-4xl",
+    full: "max-w-full min-h-screen rounded-none",
 };
 
-export default function Modal({ open, onClose, title, size = "md", children }) {
-    // Close on Escape
+const VARIANTS = {
+    default: "",
+    danger: "border-t-4 border-danger-400",
+    success: "border-t-4 border-success-400",
+};
+
+export function Modal({
+    open,
+    onClose,
+    title,
+    size = "md",
+    variant = "default",
+    footer,
+    children,
+}) {
     useEffect(() => {
         if (!open) return;
-        const handler = (e) => {
+        const h = (e) => {
             if (e.key === "Escape") onClose?.();
         };
-        document.addEventListener("keydown", handler);
-        return () => document.removeEventListener("keydown", handler);
-    }, [open, onClose]);
-
-    // Lock body scroll
-    useEffect(() => {
-        document.body.style.overflow = open ? "hidden" : "";
+        document.addEventListener("keydown", h);
+        document.body.style.overflow = "hidden";
         return () => {
+            document.removeEventListener("keydown", h);
             document.body.style.overflow = "";
         };
-    }, [open]);
+    }, [open, onClose]);
 
     if (!open) return null;
 
@@ -45,50 +58,43 @@ export default function Modal({ open, onClose, title, size = "md", children }) {
             role="dialog"
             aria-modal="true"
         >
-            {/* Backdrop */}
             <div
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in"
+                className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
                 onClick={onClose}
             />
-
-            {/* Panel */}
             <div
-                className={`relative w-full ${SIZES[size] ?? SIZES.md} bg-white rounded-2xl
-                    shadow-2xl animate-scale-in overflow-hidden`}
+                className={`relative w-full ${SIZES[size] ?? SIZES.md}
+        bg-white dark:bg-[#1a1030] rounded-2xl shadow-2xl
+        animate-scale-in overflow-hidden font-aumovio ${VARIANTS[variant]}`}
             >
                 {/* Header */}
                 {title && (
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-grey-200">
-                        <h2 className="text-base font-aumovio-bold text-black/85">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-grey-200 dark:border-grey-700">
+                        <h2 className="text-base font-aumovio-bold text-black/85 dark:text-white/90">
                             {title}
                         </h2>
                         <button
                             onClick={onClose}
-                            aria-label="Close modal"
-                            className="flex items-center justify-center w-7 h-7 rounded-lg
-                                text-grey-400 hover:text-grey-500 hover:bg-grey-100
-                                transition-colors"
+                            aria-label="Close"
+                            className="flex items-center justify-center transition-colors rounded-lg w-7 h-7 text-grey-400 hover:text-grey-600 hover:bg-grey-100 dark:hover:bg-grey-800"
                         >
-                            <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 14 14"
-                                fill="none"
-                            >
-                                <path
-                                    d="M13 1L1 13M1 1l12 12"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
-                                    strokeLinecap="round"
-                                />
-                            </svg>
+                            <XMarkIcon className="w-4 h-4" />
                         </button>
                     </div>
                 )}
-
                 {/* Body */}
-                <div className="px-6 py-5">{children}</div>
+                <div className="px-6 py-5 overflow-y-auto max-h-[70vh]">
+                    {children}
+                </div>
+                {/* Footer */}
+                {footer && (
+                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-grey-200 dark:border-grey-700 bg-grey-50 dark:bg-white/5">
+                        {footer}
+                    </div>
+                )}
             </div>
         </div>
     );
 }
+
+export default Modal;

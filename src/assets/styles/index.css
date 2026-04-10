@@ -158,6 +158,28 @@
     --font-sans: 'Aumovio', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
+:root {
+  --bg-surface:    #FFFFFF;
+  --bg-surface-2:  #FAFAFA;
+  --bg-surface-3:  #F0F0F0;
+  --text-primary:  #1A1A1A;
+  --text-secondary:#484848;
+  --text-muted:    #787878;
+  --border-color:  #DCDCDC;
+}
+
+[data-theme='dark'] {
+  --bg-surface:    #0D0D14;
+  --bg-surface-2:  #1a1030;
+  --bg-surface-3:  #251d3a;
+  --text-primary:  #F0F0F0;
+  --text-secondary:#C8C8C8;
+  --text-muted:    #787878;
+  --border-color:  #303030;
+}
+
+@variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 /* ─── Font Faces ────────────────────────────────────────────────────────── */
 @font-face {
     font-family: 'Aumovio';

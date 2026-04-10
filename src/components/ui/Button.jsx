@@ -1,51 +1,47 @@
 /**
- * Button.jsx — Reusable button component.
- *
- * Uses the same class convention as pre-set-styles.jsx:
- *   orange-400 / purple-400 / danger-400 / warn-400
+ * Button — Polymorphic button component.
  *
  * Props:
- *   variant  — 'primary' | 'accent' | 'danger' | 'warning' | 'ghost'  (default: 'primary')
- *   size     — 'sm' | 'md' | 'lg'  (default: 'md')
+ *   variant  — 'primary'|'accent'|'danger'|'warning'|'ghost'|'outline'|'link'|'gradient'
+ *   size     — 'xs'|'sm'|'md'|'lg'|'xl'
  *   loading  — boolean
  *   disabled — boolean
- *   onClick  — handler
- *   type     — 'button' | 'submit' | 'reset'  (default: 'button')
- *   className — additional classes
- *   children
+ *   fullWidth — boolean
+ *   leftIcon  — icon component
+ *   rightIcon — icon component
+ *   rounded  — boolean (pill shape)
+ *   onClick, type, className, children
  */
-
-const BASE =
-    "inline-flex items-center justify-center gap-2 font-aumovio-bold tracking-wide rounded-lg " +
-    "transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] " +
-    "active:scale-[0.98] backface-hidden border";
+const BASE = [
+    "inline-flex items-center justify-center gap-2 font-aumovio-bold tracking-wide",
+    "transition-all duration-300 ease-out",
+    "hover:-translate-y-0.5 hover:scale-[1.02] active:scale-[0.98]",
+    "backface-hidden border",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    "disabled:opacity-60 disabled:cursor-not-allowed disabled:pointer-events-none",
+].join(" ");
 
 const VARIANTS = {
     primary:
-        "text-orange-400 bg-orange-400/10 border-orange-400/25 " +
-        "hover:bg-orange-400 hover:text-white hover:border-transparent " +
-        "hover:shadow-xl hover:shadow-orange-400/30",
-    accent:
-        "text-purple-400 bg-purple-400/10 border-purple-400/20 " +
-        "hover:bg-purple-400 hover:text-white hover:border-transparent " +
-        "hover:shadow-xl hover:shadow-purple-400/30",
-    danger:
-        "text-danger-400 bg-danger-100 border-danger-400/20 " +
-        "hover:bg-danger-400 hover:text-white hover:border-transparent " +
-        "hover:shadow-xl hover:shadow-danger-400/30",
+        "text-orange-400 bg-orange-400/10 border-orange-400/25 hover:bg-orange-400 hover:text-white hover:border-transparent hover:shadow-xl hover:shadow-orange-400/30 focus-visible:ring-orange-400",
+    accent: "text-purple-400 bg-purple-400/10 border-purple-400/20 hover:bg-purple-400 hover:text-white hover:border-transparent hover:shadow-xl hover:shadow-purple-400/30 focus-visible:ring-purple-400",
+    danger: "text-danger-400 bg-danger-100    border-danger-400/20  hover:bg-danger-400 hover:text-white hover:border-transparent hover:shadow-xl hover:shadow-danger-400/30 focus-visible:ring-danger-400",
     warning:
-        "text-warn-400 bg-warn-100/20 border-warn-400/30 " +
-        "hover:bg-warn-100/20 hover:text-black hover:border-transparent " +
-        "hover:shadow-xl hover:shadow-warn-400/30",
-    ghost:
-        "text-grey-500 bg-transparent border-grey-300 " +
-        "hover:bg-grey-100 hover:text-black hover:border-grey-400",
+        "text-warn-600   bg-warn-100/30   border-warn-400/30    hover:bg-warn-400 hover:text-black hover:border-transparent hover:shadow-xl hover:shadow-warn-400/30 focus-visible:ring-warn-400",
+    ghost: "text-grey-600 dark:text-grey-300 bg-transparent border-grey-200 dark:border-grey-700 hover:bg-grey-100 dark:hover:bg-grey-800 hover:text-black dark:hover:text-white focus-visible:ring-grey-400",
+    outline:
+        "text-orange-400 bg-transparent border-orange-400 hover:bg-orange-400 hover:text-white hover:shadow-lg hover:shadow-orange-400/30 focus-visible:ring-orange-400",
+    link: "text-orange-400 bg-transparent border-transparent hover:underline underline-offset-2 hover:translate-y-0 hover:scale-100 focus-visible:ring-orange-400",
+    gradient:
+        "text-white bg-gradient-to-r from-orange-400 via-[#ff850a] to-purple-400 border-transparent hover:shadow-xl hover:shadow-orange-400/40 hover:brightness-110 focus-visible:ring-orange-400",
 };
 
 const SIZES = {
-    sm: "px-3 py-1.5 text-xs",
-    md: "px-4 py-2 text-sm",
-    lg: "px-6 py-3 text-base",
+    xs: "px-2.5 py-1    text-xs rounded-md",
+    sm: "px-3   py-1.5  text-xs rounded-lg",
+    md: "px-4   py-2    text-sm rounded-lg",
+    lg: "px-5   py-2.5  text-base rounded-lg",
+    xl: "px-7   py-3.5  text-base rounded-xl",
 };
 
 export default function Button({
@@ -53,24 +49,35 @@ export default function Button({
     size = "md",
     loading = false,
     disabled = false,
+    fullWidth = false,
+    leftIcon: LeftIcon,
+    rightIcon: RightIcon,
+    rounded = false,
     onClick,
     type = "button",
     className = "",
     children,
 }) {
-    const isDisabled = disabled || loading;
-
     return (
         <button
             type={type}
             onClick={onClick}
-            disabled={isDisabled}
-            className={`${BASE} ${VARIANTS[variant] ?? VARIANTS.primary} ${SIZES[size] ?? SIZES.md} ${isDisabled ? "opacity-60 cursor-not-allowed pointer-events-none" : ""} ${className}`}
+            disabled={disabled || loading}
+            className={`${BASE} ${VARIANTS[variant] ?? VARIANTS.primary}
+        ${SIZES[size] ?? SIZES.md}
+        ${fullWidth ? "w-full" : ""}
+        ${rounded ? "rounded-full!" : ""}
+        ${className}`}
         >
-            {loading && (
+            {loading ? (
                 <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin shrink-0" />
+            ) : (
+                LeftIcon && <LeftIcon className="w-4 h-4 shrink-0" />
             )}
             {children}
+            {!loading && RightIcon && (
+                <RightIcon className="w-4 h-4 shrink-0" />
+            )}
         </button>
     );
 }

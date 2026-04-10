@@ -8,7 +8,7 @@
 import {
     BASE_COLOR_TEXT,
     MAIN_STRONG_COLOR_TEXT,
-} from "../../../assets/styles/pre-set-styles";
+} from "../../assets/styles/pre-set-styles";
 
 export function Footer() {
     const year = new Date().getFullYear();

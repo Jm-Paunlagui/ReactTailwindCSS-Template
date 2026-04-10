@@ -31,8 +31,8 @@ import {
     SECONDARY_BORDER,
     SUBTITLE_COLOR_TEXT,
     TITLE_COLOR_TEXT,
-} from "../../../assets/styles/pre-set-styles";
-import { useLayout } from "../../../contexts/layout/LayoutContext";
+} from "../../assets/styles/pre-set-styles";
+import { useLayout } from "../../contexts/layout/LayoutContext";
 
 // ── Logo ──────────────────────────────────────────────────────────────────
 const LOGO_PLACEHOLDER = null;

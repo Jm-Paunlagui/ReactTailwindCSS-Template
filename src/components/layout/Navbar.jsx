@@ -37,9 +37,9 @@ import {
     SECONDARY_COLOR_TEXT,
     SUBTITLE_COLOR_TEXT,
     TITLE_COLOR_TEXT,
-} from "../../../assets/styles/pre-set-styles";
-import { AuthMiddleware } from "../../../middleware/authentication/AuthMiddleware";
-import httpClient from "../../../middleware/HttpClient";
+} from "../../assets/styles/pre-set-styles";
+import { AuthMiddleware } from "../../middleware/authentication/AuthMiddleware";
+import httpClient from "../../middleware/HttpClient";
 
 // ── Logo ──────────────────────────────────────────────────────────────────
 // Replace with your own logo image import.
