@@ -5,6 +5,7 @@
  * - NO AREAS constant — permission strings defined inline at each route
  * - No providers — those live in main.jsx
  * - Lazy views with Suspense fallback
+ * - Supports "top" (navbar) and "sidebar" layout modes via LayoutContext
  */
 
 import { Suspense, lazy } from "react";
@@ -15,7 +16,9 @@ import "./assets/styles/index.css";
 
 import Footer from "./components/layout/footer/Footer";
 import Navbar from "./components/layout/navbar/Navbar";
+import Sidebar from "./components/layout/sidebar/Sidebar";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
+import { useLayout } from "./contexts/layout/LayoutContext";
 import {
     BadRequest,
     InvalidToken,
@@ -46,20 +49,34 @@ const BARE_ROUTES = [
     "/service-is-currently-unavailable",
 ];
 
-function ConditionalNavbar() {
-    const { pathname } = useLocation();
-    const isBare = BARE_ROUTES.some(
+function isBareRoute(pathname) {
+    return BARE_ROUTES.some(
         (r) => pathname === r || pathname.startsWith(r + "/"),
     );
-    return isBare ? null : <Navbar />;
+}
+
+function ConditionalNavbar() {
+    const { pathname } = useLocation();
+    const { layout } = useLayout();
+    if (isBareRoute(pathname)) return null;
+    if (layout === "sidebar") return null; // sidebar mode uses Sidebar.jsx instead
+    return <Navbar />;
+}
+
+function ConditionalSidebar() {
+    const { pathname } = useLocation();
+    const { layout } = useLayout();
+    if (isBareRoute(pathname)) return null;
+    if (layout !== "sidebar") return null;
+    return <Sidebar />;
 }
 
 function ConditionalFooter() {
     const { pathname } = useLocation();
-    const isBare = BARE_ROUTES.some(
-        (r) => pathname === r || pathname.startsWith(r + "/"),
-    );
-    return isBare ? null : <Footer />;
+    const { layout } = useLayout();
+    if (isBareRoute(pathname)) return null;
+    if (layout === "sidebar") return null; // sidebar mode omits footer
+    return <Footer />;
 }
 
 function PageLoader() {
@@ -70,9 +87,81 @@ function PageLoader() {
     );
 }
 
+function AppContent() {
+    const { pathname } = useLocation();
+    const { layout, sidebarOpen } = useLayout();
+    const bare = isBareRoute(pathname);
+    const useSidebar = !bare && layout === "sidebar";
+
+    return (
+        <div className="flex min-h-screen bg-white">
+            <ConditionalSidebar />
+            <div
+                className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${
+                    useSidebar ? (sidebarOpen ? "ml-64" : "ml-16") : ""
+                }`}
+            >
+                <ConditionalNavbar />
+                <main className="grow">
+                    <Suspense fallback={<PageLoader />}>
+                        <AppRoutes />
+                    </Suspense>
+                </main>
+                <ConditionalFooter />
+            </div>
+        </div>
+    );
+}
+
+function AppRoutes() {
+    return (
+        <Routes>
+            {/* Public */}
+            <Route path="/" element={<Navigate to="/auth" replace />} />
+            <Route path="auth" element={<LoginView />} />
+            <Route path="user/logout" element={<LogoutView />} />
+
+            {/* Protected — role only */}
+            <Route
+                element={
+                    <ProtectedRoute
+                        role={[ROLES.USER, ROLES.ADMIN, ROLES.SADMIN]}
+                    />
+                }
+            >
+                <Route path="dashboard" element={<DashboardView />} />
+            </Route>
+
+            {/* Protected — role + permission (uncomment and adapt)
+            <Route element={<ProtectedRoute
+                role={[ROLES.USER, ROLES.ADMIN, ROLES.SADMIN]}
+                check={(user) => user.area?.includes('INV_CON')}
+            />}>
+                <Route path="inventory" element={<InventoryView />} />
+            </Route>
+            */}
+
+            {/* Error pages */}
+            <Route path="unauthorized" element={<Unauthorized />} />
+            <Route path="bad-request" element={<BadRequest />} />
+            <Route path="login-timeout" element={<LoginTimeOut />} />
+            <Route path="invalid-token" element={<InvalidToken />} />
+            <Route path="page-not-found" element={<PageNotFound />} />
+            <Route
+                element={<ServiceUnavailable />}
+                path="service-is-currently-unavailable"
+            />
+            <Route
+                path="*"
+                element={<Navigate to="/page-not-found" replace />}
+            />
+        </Routes>
+    );
+}
+
 export default function App() {
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <>
             <ToastContainer
                 position="bottom-right"
                 autoClose={5000}
@@ -83,79 +172,7 @@ export default function App() {
                 theme="colored"
                 className="z-50"
             />
-            <ConditionalNavbar />
-            <main className="grow">
-                <Suspense fallback={<PageLoader />}>
-                    <Routes>
-                        {/* Public */}
-                        <Route
-                            path="/"
-                            element={<Navigate to="/auth" replace />}
-                        />
-                        <Route path="auth" element={<LoginView />} />
-                        <Route path="user/logout" element={<LogoutView />} />
-
-                        {/* Protected — role only */}
-                        <Route
-                            element={
-                                <ProtectedRoute
-                                    role={[
-                                        ROLES.USER,
-                                        ROLES.ADMIN,
-                                        ROLES.SADMIN,
-                                    ]}
-                                />
-                            }
-                        >
-                            <Route
-                                path="dashboard"
-                                element={<DashboardView />}
-                            />
-                        </Route>
-
-                        {/* Protected — role + permission (uncomment and adapt)
-                        <Route element={<ProtectedRoute
-                            role={[ROLES.USER, ROLES.ADMIN, ROLES.SADMIN]}
-                            check={(user) => user.area?.includes('INV_CON')}
-                        />}>
-                            <Route path="inventory" element={<InventoryView />} />
-                        </Route>
-                        */}
-
-                        {/* Error pages */}
-                        <Route path="unauthorized" element={<Unauthorized />} />
-                        <Route path="bad-request" element={<BadRequest />} />
-                        <Route
-                            path="login-timeout"
-                            element={<LoginTimeOut />}
-                        />
-                        <Route
-                            path="invalid-token"
-                            element={<InvalidToken />}
-                        />
-                        <Route
-                            path="page-not-found"
-                            element={<PageNotFound />}
-                        />
-                        {/*
-                         * Security checkpoint error page.
-                         * Reached when CsrfGate cannot establish an encrypted session
-                         * (main.jsx does window.location.replace('/service-is-currently-unavailable')).
-                         * Uses a distinct purple/indigo palette — not the red error palette —
-                         * so users understand this is a protective security screen, not a bug.
-                         */}
-                        <Route
-                            element={<ServiceUnavailable />}
-                            path="service-is-currently-unavailable"
-                        />
-                        <Route
-                            path="*"
-                            element={<Navigate to="/page-not-found" replace />}
-                        />
-                    </Routes>
-                </Suspense>
-            </main>
-            <ConditionalFooter />
-        </div>
+            <AppContent />
+        </>
     );
 }

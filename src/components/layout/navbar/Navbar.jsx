@@ -1,14 +1,14 @@
 /**
  * Navbar.jsx
  * ──────────
- * Responsive navigation bar.
+ * Responsive navigation bar — visual design ported from OPITS-FE.
  *
  * CUSTOMISATION GUIDE
  * ───────────────────
- * 1. Replace `navConfig.js` (imported below) with your project's link definitions.
+ * 1. Update `authLinks`, `publicLinks`, `dropdownGroups` with your routes.
  * 2. The navbar reads `user.user_data.userLevel` for role-based link visibility.
- * 3. Dropdown groups are rendered from the `dropdowns` array.
- * 4. Add / remove items in navConfig without touching this component.
+ * 3. Dropdown groups are rendered from the `dropdownGroups` array.
+ * 4. Replace the logo import and APP_DISPLAY_NAME to brand your project.
  */
 
 import {
@@ -24,13 +24,15 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import {
+    ACCENT_COLOR_BORDER,
     BASE_COLOR_BG,
+    BASE_COLOR_TEXT,
     DELAY_1,
     MAIN_COLOR_TEXT,
     MAIN_FOREGROUND_COLOR_TEXT,
     MAIN_OVERLAY_COLOR_BG,
+    MAIN_PULSE_COLOR_BG,
     MAIN_STRONG_COLOR_TEXT,
-    SECONDARY_BORDER,
     SECONDARY_COLOR,
     SECONDARY_COLOR_TEXT,
     SUBTITLE_COLOR_TEXT,
@@ -40,9 +42,11 @@ import { AuthMiddleware } from "../../../middleware/authentication/AuthMiddlewar
 import httpClient from "../../../middleware/HttpClient";
 
 // ── Logo ──────────────────────────────────────────────────────────────────
-// Replace this import with your own logo asset.
-// import logo from '../../assets/img/logo.png';
-const LOGO_PLACEHOLDER = null; // set to an imported image or null to show text
+// Replace with your own logo image import.
+import logo from "../../../assets/aumovio/AUMOVIO_Logo_orange_black_RGB.png";
+
+// Display name shown beside the logo (set to null to hide).
+const APP_DISPLAY_NAME = import.meta.env.VITE_APP_NAME || null;
 
 /**
  * Build the initials shown in the user avatar button.
@@ -60,7 +64,7 @@ const NavItem = ({ item }) => (
         <div
             className={`${
                 item.current
-                    ? `${MAIN_FOREGROUND_COLOR_TEXT} ${SECONDARY_BORDER} shadow`
+                    ? `${MAIN_FOREGROUND_COLOR_TEXT} ${ACCENT_COLOR_BORDER} shadow`
                     : `${TITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
             } px-2 py-2 rounded-lg text-base transition-all duration-200 ease-out cursor-pointer`}
         >
@@ -70,45 +74,62 @@ const NavItem = ({ item }) => (
 );
 
 // ── DropdownGroup ─────────────────────────────────────────────────────────
-const DropdownGroup = ({ label, isActive, items }) => (
+const DropdownGroup = ({ label, isActive: active, isLoading, items }) => (
     <div className="relative group">
         <div
             className={`${
-                isActive
-                    ? `${MAIN_FOREGROUND_COLOR_TEXT} ${SECONDARY_BORDER} shadow`
-                    : `${TITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
+                isLoading
+                    ? `${SECONDARY_COLOR_TEXT} animate-pulse ${MAIN_PULSE_COLOR_BG} cursor-default`
+                    : active
+                      ? `${MAIN_FOREGROUND_COLOR_TEXT} ${ACCENT_COLOR_BORDER} shadow`
+                      : `${TITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
             } px-2 py-2 rounded-lg text-base transition-all duration-200 ease-out backface-hidden cursor-pointer`}
         >
-            {label}
+            {isLoading ? (
+                <span
+                    className={`w-24 bg-orange-300 rounded animate-pulse text-transparent ${DELAY_1}`}
+                >
+                    {label}
+                </span>
+            ) : (
+                label
+            )}
         </div>
         {items.length > 0 && (
-            <div className="absolute z-10 invisible py-6 mt-2 transition-all duration-300 ease-out origin-top transform -translate-x-1/2 bg-white rounded-lg shadow-2xl opacity-0 w-72 ring-1 ring-black ring-opacity-5 group-hover:opacity-100 group-hover:visible">
-                <div className="px-4 grid grid-cols-1 gap-1">
-                    {items.map((item) => (
-                        <NavLink
-                            key={item.name}
-                            to={item.href}
-                            className="group/item"
-                        >
-                            <div className="flex items-center p-3 transition-all duration-200 rounded-lg hover:bg-grey-100">
-                                <div className="flex-1">
-                                    <div
-                                        className={`${item.current ? MAIN_COLOR_TEXT : "text-grey-900 group-hover/item:text-orange-500"} text-base transition-colors duration-200`}
-                                    >
-                                        {item.name}
-                                    </div>
-                                    {item.description && (
-                                        <div className="mt-1 text-grey-500 text-sm">
-                                            {item.description}
+            <div className="absolute z-10 invisible py-6 mt-2 transition-all duration-300 ease-out origin-top transform -translate-x-1/2 bg-white rounded-lg shadow-2xl opacity-0 left-1/2 w-96 ring-1 ring-black ring-opacity-5 group-hover:opacity-100 group-hover:visible">
+                <div className="px-6">
+                    <div className="mb-4">
+                        <h3 className="mb-3 text-base tracking-wider text-gray-900 uppercase">
+                            {label}
+                        </h3>
+                        <div className="grid grid-cols-1 gap-2">
+                            {items.map((item) => (
+                                <NavLink
+                                    key={item.name}
+                                    to={item.href}
+                                    className="group/item"
+                                >
+                                    <div className="flex items-center p-3 transition-all duration-200 rounded-lg hover:bg-gray-50">
+                                        <div className="flex-1">
+                                            <div
+                                                className={`${item.current ? `${MAIN_COLOR_TEXT} ` : "text-gray-900 group-hover/item:text-orange-600"} text-base transition-colors duration-200`}
+                                            >
+                                                {item.name}
+                                            </div>
+                                            {item.description && (
+                                                <div className="mt-1 text-gray-500">
+                                                    {item.description}
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                                <span className="text-grey-400 group-hover/item:text-orange-500 transition-colors duration-200">
-                                    →
-                                </span>
-                            </div>
-                        </NavLink>
-                    ))}
+                                        <div className="text-gray-400 transition-colors duration-200 group-hover/item:text-orange-500">
+                                            →
+                                        </div>
+                                    </div>
+                                </NavLink>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         )}
@@ -251,11 +272,18 @@ export default function Navbar() {
         [user],
     );
 
+    const userDivision = useMemo(
+        () => user?.user_data?.area?.split(",")[0] || "",
+        [user],
+    );
+
     // ── Skeleton link ─────────────────────────────────────────────────────
     const SkeletonLink = () => (
         <span
-            className={`inline-block w-20 h-5 bg-orange-200 rounded animate-pulse ${DELAY_1}`}
-        />
+            className={`inline-block w-20 bg-orange-300 rounded animate-pulse text-transparent ${DELAY_1}`}
+        >
+            Loading…
+        </span>
     );
 
     return (
@@ -271,85 +299,114 @@ export default function Navbar() {
                     )}
 
                     <div className="relative">
-                        <div className="relative flex items-center justify-between h-16 md:h-20 px-4">
+                        <div className="relative flex items-center justify-between h-16 md:h-20 lg:h-24">
                             {/* ── Logo ─────────────────────────────────────────────────── */}
-                            <NavLink to="/" className="flex items-center gap-3">
-                                {LOGO_PLACEHOLDER ? (
-                                    <img
-                                        src={LOGO_PLACEHOLDER}
-                                        alt="Logo"
-                                        className="h-10 w-auto"
-                                    />
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 bg-orange-400 rounded-lg flex items-center justify-center">
-                                            <span className="text-white font-aumovio-bold text-sm">
-                                                A
-                                            </span>
-                                        </div>
-                                        <span
-                                            className={`font-aumovio-bold text-lg ${MAIN_STRONG_COLOR_TEXT} hidden md:block`}
-                                        >
-                                            {/* Replace with your app name */}
-                                            AppName
-                                        </span>
-                                    </div>
-                                )}
-                            </NavLink>
-
-                            {/* ── Desktop links ─────────────────────────────────────────── */}
-                            <div className="hidden lg:flex items-center gap-6">
-                                {navigationLinks.map((item, i) =>
-                                    item.isLoading ? (
-                                        <SkeletonLink key={i} />
-                                    ) : (
-                                        <NavItem key={item.name} item={item} />
-                                    ),
-                                )}
-
-                                {/* Dropdown groups */}
-                                {dropdownGroups.map((g) => (
-                                    <DropdownGroup
-                                        key={g.label}
-                                        label={g.label}
-                                        isActive={isActive(
-                                            g.segmentKey,
-                                            g.depth,
+                            <div className="flex items-center">
+                                <NavLink to="/">
+                                    <div
+                                        className={`relative group flex items-center ${SECONDARY_COLOR_TEXT} transition-all duration-300 ease-out delay-75 backface-hidden rounded-md`}
+                                    >
+                                        <img
+                                            alt="logo"
+                                            className="w-auto h-16 md:h-20 lg:h-24"
+                                            src={logo}
+                                        />
+                                        {APP_DISPLAY_NAME && (
+                                            <h1
+                                                className={`tracking-widest ${DELAY_1} md:flex ${BASE_COLOR_TEXT} hidden text-lg`}
+                                            >
+                                                {APP_DISPLAY_NAME}
+                                            </h1>
                                         )}
-                                        items={g.items}
-                                    />
-                                ))}
+                                        {userDivision && (
+                                            <div
+                                                className={`ml-2 tracking-widest ${DELAY_1} md:flex ${BASE_COLOR_TEXT} hidden text-lg`}
+                                            >
+                                                {userDivision}
+                                            </div>
+                                        )}
+                                    </div>
+                                </NavLink>
                             </div>
 
-                            {/* ── Right side: avatar + mobile burger ─────────────────────── */}
-                            <div className="flex items-center gap-3">
+                            {/* ── Desktop links (centred) ───────────────────────────────── */}
+                            <div className="justify-center flex-1 hidden lg:flex">
+                                <div className="flex space-x-8">
+                                    {navigationLinks.map((item, i) =>
+                                        item.isLoading ? (
+                                            <NavLink
+                                                key={`loading-${i}`}
+                                                to="#"
+                                                onClick={(e) =>
+                                                    e.preventDefault()
+                                                }
+                                            >
+                                                <div
+                                                    className={`${SECONDARY_COLOR_TEXT} animate-pulse ${MAIN_PULSE_COLOR_BG} px-2 py-2 rounded-lg text-base cursor-default`}
+                                                >
+                                                    <SkeletonLink />
+                                                </div>
+                                            </NavLink>
+                                        ) : (
+                                            <NavItem
+                                                key={item.name}
+                                                item={item}
+                                            />
+                                        ),
+                                    )}
+
+                                    {/* Dropdown groups */}
+                                    {dropdownGroups.map((g) => (
+                                        <DropdownGroup
+                                            key={g.label}
+                                            label={g.label}
+                                            isActive={isActive(
+                                                g.segmentKey,
+                                                g.depth,
+                                            )}
+                                            isLoading={isLoading}
+                                            items={g.items}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* ── Right side: avatar + mobile burger ─────────────────── */}
+                            <div className="flex items-center pr-4 space-x-4">
                                 {/* User avatar (desktop + tablet) */}
-                                {user && token && (
+                                {(user || isLoading) && token && (
                                     <Menu
                                         as="div"
                                         className="relative hidden md:block"
                                     >
                                         <MenuButton
                                             className={`${
-                                                isActive("profile", 2)
-                                                    ? `${MAIN_FOREGROUND_COLOR_TEXT} ${BASE_COLOR_BG} rounded-full`
-                                                    : `${SECONDARY_COLOR_TEXT} hover:bg-orange-500 rounded-full bg-purple-400`
-                                            } p-2 w-10 h-10 flex items-center justify-center transition-all duration-200 backface-hidden`}
+                                                isLoading
+                                                    ? `${SECONDARY_COLOR_TEXT} animate-pulse ${MAIN_PULSE_COLOR_BG} cursor-default`
+                                                    : isActive("profile")
+                                                      ? `${MAIN_FOREGROUND_COLOR_TEXT} ${BASE_COLOR_BG} rounded-full`
+                                                      : `${SECONDARY_COLOR_TEXT} hover:bg-orange-600 rounded-full bg-violet-900`
+                                            } p-2 rounded-full w-10 h-10 flex items-center justify-center transition-all duration-200 ease-out backface-hidden`}
+                                            disabled={isLoading}
                                         >
-                                            <span className="text-sm font-aumovio-bold">
-                                                {userInitials}
-                                            </span>
+                                            {isLoading ? (
+                                                <div className="w-6 h-6 bg-orange-300 rounded-full animate-pulse" />
+                                            ) : (
+                                                <div className="flex items-center justify-center w-6 h-6 rounded-full">
+                                                    {userInitials}
+                                                </div>
+                                            )}
                                         </MenuButton>
                                         <Transition
                                             as="div"
-                                            enter="transition-all ease-out duration-200"
-                                            enterFrom="opacity-0 scale-95 -translate-y-1"
+                                            enter="transition-all ease-out duration-300 transform"
+                                            enterFrom="opacity-0 scale-95 -translate-y-2"
                                             enterTo="opacity-100 scale-100 translate-y-0"
-                                            leave="transition-all ease-in duration-150"
+                                            leave="transition-all ease-in duration-200 transform"
                                             leaveFrom="opacity-100 scale-100 translate-y-0"
-                                            leaveTo="opacity-0 scale-95 -translate-y-1"
+                                            leaveTo="opacity-0 scale-95 -translate-y-2"
                                         >
-                                            <MenuItems className="absolute right-0 z-10 w-48 py-2 mt-2 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                            <MenuItems className="absolute right-0 z-10 w-48 py-2 mt-2 origin-top-right bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                 {profileLinks.map((item) => (
                                                     <MenuItem key={item.name}>
                                                         <NavLink
@@ -362,8 +419,8 @@ export default function Navbar() {
                                                                 className={`${
                                                                     item.current
                                                                         ? `${MAIN_COLOR_TEXT} ${SECONDARY_COLOR} rounded-lg`
-                                                                        : "text-grey-700 hover:bg-grey-100 rounded-lg hover:text-orange-500"
-                                                                } px-3 py-2 text-sm transition-all duration-200 block`}
+                                                                        : "text-gray-700 hover:bg-gray-50 rounded-lg hover:text-orange-600"
+                                                                } px-2 py-2 text-base transition-all duration-200 ease-out backface-hidden`}
                                                             >
                                                                 {item.name}
                                                             </div>
@@ -377,65 +434,100 @@ export default function Navbar() {
 
                                 {/* Mobile burger */}
                                 <MenuButton
-                                    className={`lg:hidden inline-flex items-center justify-center p-2 ${MAIN_STRONG_COLOR_TEXT} hover:bg-orange-50 rounded-lg transition-all duration-200`}
+                                    className={`lg:hidden inline-flex items-center justify-center p-2 ${MAIN_STRONG_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-all duration-200 ease-out backface-hidden`}
                                 >
-                                    <span className="sr-only">Open menu</span>
+                                    <span className="sr-only">
+                                        Open main menu
+                                    </span>
                                     {open ? (
-                                        <XMarkIcon className="w-6 h-6" />
+                                        <XMarkIcon
+                                            aria-hidden="true"
+                                            className="block w-6 h-6"
+                                        />
                                     ) : (
-                                        <Bars3Icon className="w-6 h-6" />
+                                        <Bars3Icon
+                                            aria-hidden="true"
+                                            className="block w-6 h-6"
+                                        />
                                     )}
                                 </MenuButton>
                             </div>
                         </div>
                     </div>
 
-                    {/* ── Mobile menu ──────────────────────────────────────────────── */}
+                    {/* ── Mobile menu ──────────────────────────────────────────── */}
                     <Transition
                         show={open}
                         as="div"
                         className="lg:hidden absolute top-full left-0 right-0 z-50"
-                        enter="transition-all ease-out duration-300"
-                        enterFrom="opacity-0 -translate-y-4"
-                        enterTo="opacity-100 translate-y-0"
-                        leave="transition-all ease-in duration-200"
-                        leaveFrom="opacity-100 translate-y-0"
-                        leaveTo="opacity-0 -translate-y-4"
+                        enter="transition-all ease-out duration-300 transform"
+                        enterFrom="opacity-0 scale-95 -translate-y-4"
+                        enterTo="opacity-100 scale-100 translate-y-0"
+                        leave="transition-all ease-in duration-200 transform"
+                        leaveFrom="opacity-100 scale-100 translate-y-0"
+                        leaveTo="opacity-0 scale-95 -translate-y-4"
                     >
                         <div
-                            className={`px-3 pt-4 pb-6 space-y-1 overflow-auto rounded-lg shadow-lg max-h-[85vh] hide-scrollbar ${MAIN_OVERLAY_COLOR_BG}`}
+                            className={`mx-auto px-2 pt-4 pb-6 space-y-2 overflow-auto rounded-lg shadow-lg max-h-[90vh] hide-scrollbar ${MAIN_OVERLAY_COLOR_BG}`}
                         >
-                            {navigationLinks.map((item, i) =>
-                                item.isLoading ? (
-                                    <div key={i} className="px-3 py-2">
-                                        <SkeletonLink />
+                            {/* Main navigation links */}
+                            {navigationLinks.map((item, index) => (
+                                <NavLink
+                                    key={item.name || `mobile-loading-${index}`}
+                                    to={item.isLoading ? "#" : item.href}
+                                    onClick={
+                                        item.isLoading
+                                            ? (e) => e.preventDefault()
+                                            : undefined
+                                    }
+                                    style={{
+                                        animationDelay: `${index * 50}ms`,
+                                        animationFillMode: "both",
+                                    }}
+                                >
+                                    <div
+                                        className={`${
+                                            item.isLoading
+                                                ? `${SECONDARY_COLOR_TEXT} animate-pulse bg-orange-200 cursor-default`
+                                                : item.current
+                                                  ? `${MAIN_FOREGROUND_COLOR_TEXT} ${ACCENT_COLOR_BORDER} shadow`
+                                                  : `${TITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
+                                        } px-2 py-2 rounded-lg text-base transition-all duration-200 ease-out backface-hidden block`}
+                                    >
+                                        {item.isLoading ? (
+                                            <span
+                                                className={`w-20 bg-orange-300 rounded animate-pulse text-transparent ${DELAY_1}`}
+                                            >
+                                                Loading…
+                                            </span>
+                                        ) : (
+                                            item.name
+                                        )}
                                     </div>
-                                ) : (
-                                    <NavLink key={item.name} to={item.href}>
-                                        <div
-                                            className={`${item.current ? `${MAIN_FOREGROUND_COLOR_TEXT} ${SECONDARY_BORDER} shadow` : `${SUBTITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-500`} px-3 py-2 rounded-lg text-base transition-all duration-200 block`}
-                                        >
-                                            {item.name}
-                                        </div>
-                                    </NavLink>
-                                ),
-                            )}
+                                </NavLink>
+                            ))}
 
                             {/* Dropdown groups (mobile — flat list with section header) */}
                             {dropdownGroups.map((g) => (
                                 <div
                                     key={g.label}
-                                    className="pt-3 border-t border-orange-100"
+                                    className="pt-4 border-t border-orange-200"
                                 >
-                                    <p
-                                        className={`px-3 py-1 text-xs uppercase tracking-wider ${TITLE_COLOR_TEXT}`}
-                                    >
-                                        {g.label}
-                                    </p>
+                                    <div className="px-2 py-2">
+                                        <h3
+                                            className={`${TITLE_COLOR_TEXT} uppercase tracking-wider`}
+                                        >
+                                            {g.label}
+                                        </h3>
+                                    </div>
                                     {g.items.map((item) => (
                                         <NavLink key={item.name} to={item.href}>
                                             <div
-                                                className={`${item.current ? `${MAIN_FOREGROUND_COLOR_TEXT} ${SECONDARY_BORDER} shadow` : `${SUBTITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-500`} px-3 py-2 rounded-lg text-base transition-all duration-200 block`}
+                                                className={`${
+                                                    item.current
+                                                        ? `${MAIN_FOREGROUND_COLOR_TEXT} ${ACCENT_COLOR_BORDER} shadow`
+                                                        : `${SUBTITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
+                                                } px-2 py-2 rounded-lg text-base transition-all duration-200 ease-out backface-hidden block`}
                                             >
                                                 {item.name}
                                             </div>
@@ -445,13 +537,15 @@ export default function Navbar() {
                             ))}
 
                             {/* Profile links (mobile) */}
-                            {user && token && (
-                                <div className="pt-3 border-t border-orange-100">
-                                    <p
-                                        className={`px-3 py-1 text-xs uppercase tracking-wider ${TITLE_COLOR_TEXT}`}
-                                    >
-                                        Account
-                                    </p>
+                            {(user || isLoading) && token && (
+                                <div className="pt-4 border-t border-orange-200">
+                                    <div className="px-2 py-2">
+                                        <h3
+                                            className={`${TITLE_COLOR_TEXT} uppercase tracking-wider`}
+                                        >
+                                            Account
+                                        </h3>
+                                    </div>
                                     {profileLinks.map((item) => (
                                         <NavLink
                                             key={item.name}
@@ -459,7 +553,11 @@ export default function Navbar() {
                                             onClick={item.onClick}
                                         >
                                             <div
-                                                className={`${SUBTITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-500 px-3 py-2 rounded-lg text-base transition-all duration-200 block`}
+                                                className={`${
+                                                    item.current
+                                                        ? `${MAIN_FOREGROUND_COLOR_TEXT} ${ACCENT_COLOR_BORDER} shadow`
+                                                        : `${SUBTITLE_COLOR_TEXT} hover:bg-orange-50 hover:text-orange-600`
+                                                } px-2 py-2 rounded-lg text-base transition-all duration-200 ease-out backface-hidden block`}
                                             >
                                                 {item.name}
                                             </div>

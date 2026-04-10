@@ -24,12 +24,7 @@ const BASE_URL =
     import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1/";
 
 // CSRF is not required for these endpoints (they ARE the CSRF endpoints)
-const CSRF_EXEMPT = [
-    "csrf/token",
-    "csrf/refresh",
-    "csrf/verify",
-    "csrf/status",
-];
+const CSRF_EXEMPT = ["csrf/token", "csrf/refresh", "csrf/status"];
 
 // These endpoints do not need Authorization headers
 const AUTH_EXEMPT = ["csrf/token", "csrf/refresh"];
@@ -72,7 +67,7 @@ class HttpClient {
 
                 // JWT header
                 if (!isExemptAuth) {
-                    const token = AuthMiddleware.getCookie('token');
+                    const token = AuthMiddleware.getCookie("token");
                     if (token) {
                         config.headers["Authorization"] = `Bearer ${token}`;
                     }

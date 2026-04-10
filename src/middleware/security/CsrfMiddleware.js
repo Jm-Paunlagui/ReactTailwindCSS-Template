@@ -2,15 +2,15 @@
  * CsrfMiddleware — CSRF token lifecycle manager.
  *
  * Singleton class that handles fetching, caching, rotating, and
- * auto-refreshing the CSRF token. Mirrors the express-template's
- * CsrfMiddleware class philosophy: one class, one responsibility.
+ * auto-refreshing the CSRF token. Uses the csrf-csrf library convention.
  *
- * Backend contract:
+ * Backend contract (csrf-csrf):
  *   GET  /csrf/token   → { success, token, expiresIn, expiresAt, refreshIn }
  *   POST /csrf/refresh → { success, token, expiresIn, expiresAt, refreshIn }
+ *   GET  /csrf/status  → { success, isValid, expiresAt }
  *
  * Token is stored in memory only — never localStorage or cookies.
- * Backend manages the HTTP-only secret cookie automatically.
+ * Backend manages the HTTP-only secret cookie automatically (csrf-csrf).
  */
 
 const API_BASE_URL =
@@ -112,6 +112,22 @@ class CsrfMiddleware {
             // Refresh POST failed (token already invalid) — fall back to GET
             return this._fetchToken();
         }
+    }
+
+    /**
+     * Query the backend /csrf/status endpoint.
+     * Returns { success, isValid, expiresAt } or throws.
+     */
+    async getStatus() {
+        const response = await fetch(`${API_BASE_URL}csrf/status`, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
     }
 
     /**

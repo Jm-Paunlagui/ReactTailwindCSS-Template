@@ -2,19 +2,20 @@
  * main.jsx — Entry point.
  *
  * Provider chain (outermost → innermost):
- *   BrowserRouter → CsrfProvider → App
+ *   BrowserRouter → CsrfProvider → LayoutProvider → App
  *
  * Rules:
  * - All providers live here, never in App.jsx
  * - App.jsx contains only Routes
  */
 
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import LoadingScreen from "./components/layout/loading/LoadingScreen";
-import { CsrfProvider , useCsrf} from "./contexts/security/CsrfContext";
+import { LayoutProvider } from "./contexts/layout/LayoutContext";
+import { CsrfProvider, useCsrf } from "./contexts/security/CsrfContext";
 
 // Minimum time (ms) the LoadingScreen stays visible, regardless of how fast
 // the CSRF token resolves. Keeps the screen from flickering on fast backends.
@@ -48,7 +49,9 @@ createRoot(document.getElementById("root")).render(
         <BrowserRouter>
             <CsrfProvider>
                 <CsrfGate>
-                    <App />
+                    <LayoutProvider>
+                        <App />
+                    </LayoutProvider>
                 </CsrfGate>
             </CsrfProvider>
         </BrowserRouter>
