@@ -29,7 +29,7 @@ const DashboardView = lazy(() => import("./features/dashboard/Dashboard.view"));
 // Permission strings (AREAS) are NOT here — they are inline at each route
 const ROLES = { SADMIN: 3, ADMIN: 2, USER: 1 };
 
-const BARE_ROUTES = ["/auth", "/sign-up", "/", "/user/logout", "/unauthorized", "/login-timeout", "/invalid-token", "/bad-request", "/page-not-found", "/service-is-currently-unavailable"];
+const BARE_ROUTES = ["/auths", "/sign-up", "/", "/user/logout", "/unauthorized", "/login-timeout", "/invalid-token", "/bad-request", "/page-not-found", "/service-is-currently-unavailable"];
 
 function isBareRoute(pathname) {
     return BARE_ROUTES.some((r) => pathname === r || pathname.startsWith(r + "/"));
@@ -76,7 +76,7 @@ function AppContent() {
     return (
         <div className="flex min-h-screen bg-white dark:bg-[#0D0D14] transition-colors duration-300">
             <ConditionalSidebar />
-            <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${useSidebar ? (sidebarOpen ? "ml-64" : "ml-16") : ""}`}>
+            <div className={`flex flex-col flex-1 min-h-screen transition-all duration-300 ${useSidebar ? (sidebarOpen ? "ml-auto" : "ml-16") : ""}`}>
                 <ConditionalNavbar />
                 <main className="grow">
                     <Suspense fallback={<PageLoader />}>
