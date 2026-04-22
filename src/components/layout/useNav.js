@@ -20,7 +20,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { AuthMiddleware } from "../../middleware/authentication/AuthMiddleware";
-import httpClient from "../../middleware/HttpClient";
 import { AUTH_FLAT_LINKS, NAV_GROUPS, PUBLIC_LINKS } from "./nav.config";
 
 export function useNav() {
@@ -43,10 +42,6 @@ export function useNav() {
     }, []);
 
     const logout = useCallback(() => {
-        httpClient
-            .post("auth/logout")
-            .then((r) => toast.success(r.data?.message || "Signed out"))
-            .catch((e) => toast.error(e?.response?.data?.message || "Logout failed"));
         navigate("/user/logout");
     }, [navigate]);
 
