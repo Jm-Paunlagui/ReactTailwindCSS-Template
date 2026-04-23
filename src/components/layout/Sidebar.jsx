@@ -77,9 +77,9 @@ const GROUP_COLOR_MAP = {
     },
     grey: {
         dot: "bg-grey-400",
-        activeBg: "bg-grey-100 dark:bg-grey-800",
+        activeBg: "bg-grey-100 dark:bg-[#251d3a]",
         activeText: "text-grey-700 dark:text-grey-300",
-        hoverBg: "hover:bg-grey-100 dark:hover:bg-grey-800",
+        hoverBg: "hover:bg-grey-100 dark:hover:bg-[#251d3a]",
         hoverText: "hover:text-grey-700 dark:hover:text-grey-300",
     },
 };
@@ -169,7 +169,7 @@ function SidebarGroup({ group, collapsed, currentPath }) {
         return (
             <div className="flex flex-col items-center gap-0.5 py-1">
                 <Tooltip content={group.label} placement="right" delay={100}>
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-aumovio-bold uppercase cursor-default ${isGroupActive ? `${col.activeBg} ${col.activeText}` : "text-grey-400 dark:text-grey-500 hover:bg-grey-100 dark:hover:bg-grey-800"}`}>{group.label.charAt(0)}</div>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-aumovio-bold uppercase cursor-default ${isGroupActive ? `${col.activeBg} ${col.activeText}` : "text-grey-400 dark:text-grey-500 hover:bg-grey-100 dark:hover:bg-[#251d3a]"}`}>{group.label.charAt(0)}</div>
                 </Tooltip>
                 {group.items.map((item) => {
                     const active = currentPath === item.href || (item.href !== "/" && currentPath.startsWith(item.href + "/"));

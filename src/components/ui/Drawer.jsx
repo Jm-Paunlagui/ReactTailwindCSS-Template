@@ -96,7 +96,7 @@ export function Drawer({ open, onClose, side = "right", size = "md", title, back
                         onClick={onClose}
                         aria-label="Close drawer"
                         className={`p-1.5 rounded-lg text-grey-400 hover:text-grey-600 dark:hover:text-grey-300 hover:bg-grey-100
-              dark:hover:bg-grey-800 ${TRANSITION_COLORS}`}
+              dark:hover:bg-[#251d3a] ${TRANSITION_COLORS}`}
                     >
                         <XMarkIcon className="w-5 h-5" />
                     </button>

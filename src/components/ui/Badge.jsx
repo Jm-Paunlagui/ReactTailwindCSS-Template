@@ -48,7 +48,7 @@ const V = {
         dot: "bg-yellow-400",
     },
     grey: {
-        solid: "text-grey-500 dark:text-grey-400 bg-grey-100 dark:bg-grey-800 border-grey-400/30 dark:border-grey-600/30",
+        solid: "text-grey-500 dark:text-grey-400 bg-grey-100 dark:bg-[#251d3a] border-grey-400/30 dark:border-grey-600/30",
         outline: "text-grey-500 dark:text-grey-400 border-grey-400 dark:border-grey-600 bg-transparent",
         dot: "bg-grey-400",
     },

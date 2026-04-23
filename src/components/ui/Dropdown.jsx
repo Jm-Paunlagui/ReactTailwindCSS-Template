@@ -63,7 +63,7 @@ export function Dropdown({ trigger, items = [], placement = "bottom-start", widt
                                 <span className="flex-1">{item.label}</span>
                                 {item.shortcut && (
                                     <kbd
-                                        className="text-xs text-grey-400 font-mono bg-grey-100 dark:bg-grey-800
+                                        className="text-xs text-grey-400 font-mono bg-grey-100 dark:bg-[#251d3a]
                     border border-grey-200 dark:border-grey-700 rounded px-1.5 py-0.5"
                                     >
                                         {item.shortcut}

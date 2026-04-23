@@ -55,13 +55,13 @@ export function Avatar({ src, name = "", size = "md", shape = "circle", status, 
                     src={src}
                     alt={name || "Avatar"}
                     className={`${sz.wrap} ${radius} object-cover
-            ${bordered ? "ring-2 ring-white dark:ring-grey-800" : ""}`}
+            ${bordered ? "ring-2 ring-white dark:ring-[#1a1030]" : ""}`}
                 />
             ) : (
                 <span
                     className={`flex items-center justify-center w-full h-full font-aumovio-bold
           ${radius} ${color} ${sz.text}
-          ${bordered ? "ring-2 ring-white dark:ring-grey-800" : ""}`}
+          ${bordered ? "ring-2 ring-white dark:ring-[#1a1030]" : ""}`}
                 >
                     {initials}
                 </span>
@@ -88,8 +88,8 @@ export function AvatarGroup({ avatars = [], max = 4, size = "md", shape = "circl
             {overflow > 0 && (
                 <span
                     className={`-ml-3 flex items-center justify-center ${sz.wrap}
-          rounded-full bg-grey-200 dark:bg-grey-700 text-grey-600 dark:text-grey-300
-          font-aumovio-bold ${sz.text} ring-2 ring-white dark:ring-grey-800`}
+          rounded-full bg-grey-200 dark:bg-[#251d3a] text-grey-600 dark:text-grey-300
+          font-aumovio-bold ${sz.text} ring-2 ring-white dark:ring-[#1a1030]`}
                 >
                     +{overflow}
                 </span>

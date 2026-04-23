@@ -50,7 +50,7 @@ export function Radio({ name, options = [], value, onChange, label: groupLabel, 
                             <input type="radio" name={name} value={opt.value} checked={value === opt.value} onChange={() => !opt.disabled && !disabled && onChange?.(opt.value)} disabled={opt.disabled || disabled} className="sr-only" />
                             <div
                                 className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${TRANSITION_COLORS}
-                ${value === opt.value ? "border-orange-400 bg-orange-400" : "border-grey-300 dark:border-grey-600 hover:border-orange-400 bg-white dark:bg-grey-800"}`}
+                ${value === opt.value ? "border-orange-400 bg-orange-400" : "border-grey-300 dark:border-grey-600 hover:border-orange-400 bg-white dark:bg-[#251d3a]"}`}
                             >
                                 {value === opt.value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                             </div>

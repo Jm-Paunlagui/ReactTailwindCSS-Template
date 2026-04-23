@@ -22,7 +22,7 @@ export function Checkbox({ id, name, label, checked = false, onChange, disabled 
             <input ref={ref} type="checkbox" id={id ?? name} name={name} checked={checked} onChange={onChange} disabled={disabled} className="sr-only peer" />
             <div
                 className={`w-4 h-4 rounded border-2 ${TRANSITION_COLORS} flex items-center justify-center
-        ${checked || indeterminate ? "bg-orange-400 border-orange-400" : "bg-white dark:bg-grey-800 border-grey-300 dark:border-grey-600 peer-hover:border-orange-400"}
+        ${checked || indeterminate ? "bg-orange-400 border-orange-400" : "bg-white dark:bg-[#251d3a] border-grey-300 dark:border-grey-600 peer-hover:border-orange-400"}
         ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
         ${error ? "border-danger-400" : ""}`}
             >

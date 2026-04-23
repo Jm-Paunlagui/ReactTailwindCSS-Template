@@ -1,6 +1,6 @@
 import { ComputerDesktopIcon, MoonIcon, SunIcon } from "@heroicons/react/24/outline";
-import { useTheme } from "../../contexts/theme/ThemeContext";
 import { TRANSITION_COLORS } from "../../assets/styles/pre-set-styles";
+import { useTheme } from "../../contexts/theme/ThemeContext";
 
 const ICONS = {
     system: ComputerDesktopIcon,
@@ -30,12 +30,12 @@ export function ThemeToggle({ size = "md", variant = "cycle" }) {
 
     // Segmented 3-button variant
     return (
-        <div className="inline-flex items-center gap-0.5 p-1 rounded-xl bg-grey-100 dark:bg-grey-800 border border-grey-200 dark:border-grey-700">
+        <div className="inline-flex items-center gap-0.5 p-1 rounded-xl bg-grey-100 dark:bg-[#251d3a] border border-grey-200 dark:border-grey-700">
             {["system", "light", "dark"].map((m) => {
                 const Icon = ICONS[m];
                 const active = mode === m;
                 return (
-                    <button key={m} onClick={() => setMode(m)} aria-label={LABELS[m]} title={LABELS[m]} className={`p-1.5 rounded-lg ${TRANSITION_COLORS} ${active ? "bg-white dark:bg-grey-700 text-orange-400 shadow-sm" : "text-grey-500 dark:text-grey-400 hover:text-orange-400"}`}>
+                    <button key={m} onClick={() => setMode(m)} aria-label={LABELS[m]} title={LABELS[m]} className={`p-1.5 rounded-lg ${TRANSITION_COLORS} ${active ? "bg-white dark:bg-[#1a1030] text-orange-400 shadow-sm" : "text-grey-500 dark:text-grey-400 hover:text-orange-400"}`}>
                         <Icon className={sz} />
                     </button>
                 );

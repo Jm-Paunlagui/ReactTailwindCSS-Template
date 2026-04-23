@@ -77,7 +77,7 @@ export function FileInput({ label, name, accept, multiple = false, disabled = fa
             {files.length > 0 && (
                 <ul className="mt-3 space-y-2">
                     {files.map((f, i) => (
-                        <li key={i} className="flex items-center gap-2 px-3 py-2 text-sm border rounded-lg bg-grey-50 dark:bg-grey-800 border-grey-200 dark:border-grey-700">
+                        <li key={i} className="flex items-center gap-2 px-3 py-2 text-sm border rounded-lg bg-grey-50 dark:bg-[#251d3a] border-grey-200 dark:border-grey-700">
                             {preview && f.type.startsWith("image/") && <img src={URL.createObjectURL(f)} className="object-cover w-8 h-8 rounded" alt="" />}
                             <span className="flex-1 truncate text-black/70 dark:text-white/70">{f.name}</span>
                             <span className="text-xs text-grey-400 shrink-0">{(f.size / 1024).toFixed(0)} KB</span>

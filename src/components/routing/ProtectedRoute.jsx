@@ -43,14 +43,14 @@ export default function ProtectedRoute({ role = null, check = null, redirectTo =
                 return;
             }
 
-            // Role check
-            if (role && !role.includes(user.user_data?.userLevel)) {
+            // Role check — user.role is a string: "SuperAdmin" | "Admin" | "User"
+            if (role && !role.includes(user.role)) {
                 setStatus("denied");
                 return;
             }
 
             // Predicate check (dynamic permissions)
-            if (check && !check(user.user_data ?? user)) {
+            if (check && !check(user)) {
                 setStatus("denied");
                 return;
             }

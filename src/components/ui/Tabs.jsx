@@ -24,7 +24,7 @@ export function Tabs({ tabs = [], defaultTab, variant = "underline", size = "md"
 
     const NAV_STYLES = {
         underline: "border-b border-grey-200 dark:border-grey-700 flex gap-1",
-        pill: "flex gap-1 p-1 bg-grey-100 dark:bg-grey-800 rounded-xl w-fit",
+        pill: "flex gap-1 p-1 bg-grey-100 dark:bg-[#251d3a] rounded-xl w-fit",
         boxed: "flex gap-0 border border-grey-200 dark:border-grey-700 rounded-xl overflow-hidden w-fit",
         vertical: "flex flex-col gap-1 border-r border-grey-200 dark:border-grey-700 pr-2",
     };
@@ -38,7 +38,7 @@ export function Tabs({ tabs = [], defaultTab, variant = "underline", size = "md"
             ${TRANSITION_COLORS}
             ${a ? "bg-orange-400 text-white" : "bg-white dark:bg-[#1a1030] text-grey-500 hover:bg-orange-50 dark:hover:bg-orange-400/10 hover:text-orange-400"}`,
         vertical: (a) => `rounded-lg text-left ${TRANSITION_COLORS} font-aumovio-bold
-            ${a ? "bg-orange-50 dark:bg-orange-400/10 text-orange-400" : "text-grey-500 hover:bg-grey-100 dark:hover:bg-grey-800 hover:text-orange-400"}`,
+            ${a ? "bg-orange-50 dark:bg-orange-400/10 text-orange-400" : "text-grey-500 hover:bg-grey-100 dark:hover:bg-[#251d3a] hover:text-orange-400"}`,
     };
 
     return (

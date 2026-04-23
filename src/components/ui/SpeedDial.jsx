@@ -33,7 +33,7 @@ export function SpeedDial({ icon: Icon = PlusIcon, actions = [], direction = "up
           ${open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
                     style={{ transitionDelay: open ? `${i * 50}ms` : "0ms" }}
                 >
-                    {tooltip && isReverse && <span className="px-2 py-1 text-xs bg-white border rounded-lg shadow font-aumovio-bold dark:bg-grey-800 text-black/80 dark:text-white/80 border-grey-200 dark:border-grey-700 whitespace-nowrap">{a.label}</span>}
+                    {tooltip && isReverse && <span className="px-2 py-1 text-xs bg-white border rounded-lg shadow font-aumovio-bold dark:bg-[#251d3a] text-black/80 dark:text-white/80 border-grey-200 dark:border-grey-700 whitespace-nowrap">{a.label}</span>}
                     <button
                         onClick={() => {
                             a.onClick?.();

@@ -1,11 +1,11 @@
 /**
- * HttpClient — Axios instance with automatic JWT + CSRF injection.
+ * HttpClient — Axios instance with automatic CSRF injection and request traceability.
  *
  * This is the ONLY place Axios is configured. Never import Axios directly
  * in feature files. Always use this module.
  *
  * What it does automatically:
- *   - Injects Authorization: Bearer <token> from cookie
+ *   - Sends HttpOnly signed `accessToken` cookie automatically via withCredentials (browser handles this)
  *   - Injects x-csrf-token on POST/PUT/DELETE/PATCH via CsrfMiddleware
  *   - Retries once on CSRF 403 errors after token refresh
  *   - Adds X-Client-Username header for server-side traceability
@@ -25,8 +25,8 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api
 // CSRF is not required for these endpoints (they ARE the CSRF endpoints)
 const CSRF_EXEMPT = ["csrf/token", "csrf/refresh", "csrf/status"];
 
-// These endpoints do not need Authorization headers
-const AUTH_EXEMPT = ["csrf/token", "csrf/refresh"];
+// These endpoints do not need X-Client-Username (no user context yet)
+const TRACEABILITY_EXEMPT = ["csrf/token", "csrf/refresh"];
 
 class HttpClient {
     constructor() {
@@ -54,20 +54,15 @@ class HttpClient {
     _setupRequestInterceptor() {
         this._client.interceptors.request.use(
             async (config) => {
-                const isExemptAuth = AUTH_EXEMPT.some((p) => config.url?.includes(p));
+                const isExemptAuth = TRACEABILITY_EXEMPT.some((p) => config.url?.includes(p));
                 const isExemptCsrf = CSRF_EXEMPT.some((p) => config.url?.includes(p));
                 const isMutating = ["POST", "PUT", "DELETE", "PATCH"].includes(config.method?.toUpperCase());
 
-                // JWT header
+                // Client identity for server traceability
                 if (!isExemptAuth) {
-                    const token = AuthMiddleware.getCookie("token");
-                    if (token) {
-                        config.headers["Authorization"] = `Bearer ${token}`;
-                    }
-
-                    // Client identity for server traceability
                     const user = AuthMiddleware.getLocalStorage("user");
-                    config.headers["X-Client-Username"] = user?.user_data ? `${user.user_data.username}@${user.user_data.userId}` : "anonymous@unknown";
+                    const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(" ") || user?.userId;
+                    config.headers["X-Client-Username"] = displayName ? `${displayName}@${user.userId}` : "anonymous@unknown";
                 }
 
                 // CSRF header

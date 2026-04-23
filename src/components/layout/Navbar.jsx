@@ -165,7 +165,6 @@ export default function Navbar() {
                             <NavLink to="/" className="flex items-center gap-2">
                                 <Logo className="h-8 md:h-10 lg:h-12 w-auto" />
                                 {APP_DISPLAY_NAME && <span className={`hidden md:block tracking-widest text-base ${BASE_COLOR_TEXT}`}>{APP_DISPLAY_NAME}</span>}
-                                {userDivision && <span className={`hidden md:block tracking-widest text-base ${BASE_COLOR_TEXT}`}>{userDivision}</span>}
                             </NavLink>
 
                             {/* Desktop centred link bar */}
@@ -234,7 +233,7 @@ export default function Navbar() {
                                                 <div className="py-1.5 px-1.5 space-y-0.5">
                                                     {profileItems.map((item, i) => {
                                                         if (item.divider) {
-                                                            return <div key={`divider-${i}`} className="my-1 h-px bg-grey-100 dark:bg-grey-800 mx-2" />;
+                                                            return <div key={`divider-${i}`} className="my-1 h-px bg-grey-100 dark:bg-[#251d3a] mx-2" />;
                                                         }
                                                         const Icon = item.icon;
                                                         return (

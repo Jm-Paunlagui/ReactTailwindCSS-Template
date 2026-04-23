@@ -75,11 +75,12 @@ class AuthMiddleware {
     // ─── Auth lifecycle ───────────────────────────────────────────────────────
 
     /**
-     * Set token cookie and call next() — call after successful login.
+     * Clear auth cache and call next() — call after successful login.
+     * Token cookie is set server-side (HTTP-only) — no client cookie needed.
      */
     static authenticate(token, next) {
-        AuthMiddleware.setCookie("token", token);
-        next();
+        AuthMiddleware.clearAuthCache();
+        if (typeof next === "function") next();
     }
 
     /**
@@ -88,7 +89,7 @@ class AuthMiddleware {
      */
     static signout() {
         AuthMiddleware.clearAuthCache();
-        AuthMiddleware.removeCookie("token");
+        AuthMiddleware.removeCookie("token"); // cleanup stale plain cookie from older sessions
         AuthMiddleware.removeLocalStorage("user");
     }
 
@@ -104,29 +105,25 @@ class AuthMiddleware {
     /**
      * Check if the user is authenticated.
      *
-     * 1. Returns false immediately if no token cookie exists
-     * 2. Returns cached user if cache is still valid (5 min)
-     * 3. Returns recent localStorage user if _lastVerified is < 5 min ago
-     * 4. Otherwise calls POST /user-auth/verify and caches the result
+     * 1. No localStorage user → not logged in, return false immediately
+     * 2. In-memory cache still valid (5 min) → return cached user
+     * 3. localStorage user verified < 5 min ago → promote to cache, return user
+     * 4. Otherwise call GET auth/me — HTTP-only cookie is sent automatically
+     *    via withCredentials:true; 401 → clear state and return false.
      *
      * @returns {Object|false} user object or false
      */
     static async isAuth() {
         if (typeof window === "undefined") return false;
 
-        const token = AuthMiddleware.getCookie("token");
-        if (!token) {
-            AuthMiddleware.clearAuthCache();
-            return false;
-        }
-
+        // If no stored user, there is no session to verify
         const userStr = localStorage.getItem("user");
         if (!userStr) {
             AuthMiddleware.clearAuthCache();
             return false;
         }
 
-        // Return from cache
+        // Return from in-memory cache
         if (_authCache && _authCacheTimestamp && Date.now() - _authCacheTimestamp < AUTH_CACHE_DURATION) {
             return _authCache;
         }
@@ -134,7 +131,7 @@ class AuthMiddleware {
         // Deduplicate concurrent calls
         if (_pendingAuthRequest) return _pendingAuthRequest;
 
-        // Check if stored user data is recent enough
+        // Fast path: stored user was verified recently — no round-trip needed
         try {
             const user = JSON.parse(userStr);
             if (user._lastVerified && Date.now() - user._lastVerified < 5 * 60 * 1000) {
@@ -143,14 +140,14 @@ class AuthMiddleware {
                 return user;
             }
         } catch {
-            /* fall through to verify */
+            /* fall through to server verify */
         }
 
-        // Verify with backend
+        // Verify with backend — HTTP-only cookie is sent automatically
         _pendingAuthRequest = (async () => {
             try {
-                const response = await httpClient.post("user-auth/verify", { TOKEN: token });
-                const user = response.data?.data?.user || response.data?.user;
+                const response = await httpClient.get("auth/me");
+                const user = response.data?.data;
 
                 if (user) {
                     const userWithTimestamp = { ...user, _lastVerified: Date.now() };
@@ -162,9 +159,11 @@ class AuthMiddleware {
                 }
 
                 AuthMiddleware.clearAuthCache();
+                localStorage.removeItem("user");
                 return false;
             } catch {
                 AuthMiddleware.clearAuthCache();
+                localStorage.removeItem("user");
                 return false;
             }
         })();
@@ -173,7 +172,5 @@ class AuthMiddleware {
     }
 }
 
-// Singleton export
-const authMiddleware = new AuthMiddleware();
-export default authMiddleware;
+export default AuthMiddleware;
 export { AuthMiddleware };

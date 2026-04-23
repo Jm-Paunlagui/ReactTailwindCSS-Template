@@ -30,7 +30,7 @@ export function ChatBubble({ message, sender, timestamp, position = "left", stat
                 {!isRight && sender?.name && <span className="px-1 text-xs text-grey-500 font-aumovio-bold">{sender.name}</span>}
                 <div
                     className={`relative rounded-2xl px-4 py-2.5 text-sm leading-relaxed
-          ${isRight ? "bg-orange-400 text-white rounded-br-sm" : "bg-grey-100 dark:bg-grey-800 text-black/85 dark:text-white/85 rounded-bl-sm"}`}
+          ${isRight ? "bg-orange-400 text-white rounded-br-sm" : "bg-grey-100 dark:bg-[#251d3a] text-black/85 dark:text-white/85 rounded-bl-sm"}`}
                 >
                     {type === "image" && imageUrl && <img src={imageUrl} alt="Shared" className="max-w-full mb-1 rounded-lg" />}
                     {type === "file" && (
@@ -46,7 +46,7 @@ export function ChatBubble({ message, sender, timestamp, position = "left", stat
                         {reactions.map((r, i) => (
                             <span
                                 key={i}
-                                className="text-xs bg-white dark:bg-grey-800 border border-grey-200
+                                className="text-xs bg-white dark:bg-[#251d3a] border border-grey-200
                 dark:border-grey-700 rounded-full px-1.5 py-0.5 shadow-sm"
                             >
                                 {r.emoji} {r.count}

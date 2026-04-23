@@ -44,7 +44,7 @@ export function PhoneInput({ value = "", onChange, label, error, disabled = fals
                         emit(e.target.value, num);
                     }}
                     disabled={disabled}
-                    className={`bg-grey-50 dark:bg-grey-800 text-sm font-aumovio-bold
+                    className={`bg-grey-50 dark:bg-[#251d3a] text-sm font-aumovio-bold
             border-r border-grey-200 dark:border-grey-700 px-2 focus:outline-none
             text-black/80 dark:text-white/80 cursor-pointer ${SZ[size] ?? SZ.md}`}
                 >

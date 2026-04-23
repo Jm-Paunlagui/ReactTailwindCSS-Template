@@ -21,7 +21,7 @@ const COLORS = {
 export function Timeline({ items = [], variant = "left", connect = true }) {
     return (
         <ol className="relative font-aumovio">
-            {connect && <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-grey-200 dark:bg-grey-700" />}
+            {connect && <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-grey-200 dark:bg-[#251d3a]" />}
             <div className="space-y-8">
                 {items.map((item, i) => {
                     const colCls = COLORS[item.color ?? "orange"] ?? COLORS.orange;
