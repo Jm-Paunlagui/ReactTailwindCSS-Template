@@ -25,15 +25,15 @@ import { NavLink, useLocation } from "react-router-dom";
 import { MAIN_OVERLAY_COLOR_TEXT, MAIN_STRONG_COLOR_BG } from "../../assets/styles/pre-set-styles";
 
 const SEPARATORS = {
-    slash: <span className="select-none text-grey-400">/</span>,
-    chevron: <ChevronRightIcon className="w-3.5 h-3.5 text-grey-400 shrink-0" />,
-    dot: <span className="w-1 h-1 rounded-full bg-grey-400 shrink-0" />,
+    slash: <span className="select-none text-grey-400 dark:text-grey-500">/</span>,
+    chevron: <ChevronRightIcon className="w-3.5 h-3.5 text-grey-400 dark:text-grey-500 shrink-0" />,
+    dot: <span className="w-1 h-1 rounded-full bg-grey-400 dark:bg-grey-500 shrink-0" />,
 };
 
 const BAR_SEPARATORS = {
-    slash: <span className="select-none text-white/60">/</span>,
-    chevron: <ChevronRightIcon className="w-3.5 h-3.5 text-white/60 shrink-0" />,
-    dot: <span className="w-1 h-1 rounded-full bg-white/60 shrink-0" />,
+    slash: <span className="select-none text-white/60 dark:text-grey-500">/</span>,
+    chevron: <ChevronRightIcon className="w-3.5 h-3.5 text-white/60 dark:text-grey-500 shrink-0" />,
+    dot: <span className="w-1 h-1 rounded-full bg-white/60 dark:bg-grey-500 shrink-0" />,
 };
 
 /**
@@ -87,17 +87,17 @@ export function Breadcrumb({ items, auto = false, separator = "chevron", size = 
                         {i > 0 && (seps[separator] ?? seps.chevron)}
 
                         {isLast ? (
-                            <span className={`flex items-center gap-1 font-aumovio-bold ${isBar ? `${MAIN_OVERLAY_COLOR_TEXT} rounded px-2 py-0.5` : "text-orange-400"}`} aria-current="page">
+                            <span className={`flex items-center gap-1 font-aumovio-bold ${isBar ? `${MAIN_OVERLAY_COLOR_TEXT} dark:text-orange-400 dark:drop-shadow-none rounded px-2 py-0.5` : "text-orange-400"}`} aria-current="page">
                                 {item.icon && <item.icon className="w-3.5 h-3.5" />}
                                 {item.label}
                             </span>
                         ) : item.href ? (
-                            <NavLink to={item.href} className={`flex items-center gap-1 transition-colors duration-200 ${isBar ? "text-white/70 hover:text-white" : "text-grey-500 dark:text-grey-400 hover:text-orange-400"}`}>
+                            <NavLink to={item.href} className={`flex items-center gap-1 transition-colors duration-200 ${isBar ? "text-white/70 hover:text-white dark:text-grey-400 dark:hover:text-orange-400" : "text-grey-500 dark:text-grey-400 hover:text-orange-400"}`}>
                                 {i === 0 && homeIcon ? <HomeIcon className="w-3.5 h-3.5" /> : item.icon && <item.icon className="w-3.5 h-3.5" />}
                                 {item.label}
                             </NavLink>
                         ) : (
-                            <span className={`flex items-center gap-1 ${isBar ? "text-white/70" : "text-grey-500 dark:text-grey-400"}`}>
+                            <span className={`flex items-center gap-1 ${isBar ? "text-white/70 dark:text-grey-400" : "text-grey-500 dark:text-grey-400"}`}>
                                 {i === 0 && homeIcon ? <HomeIcon className="w-3.5 h-3.5" /> : item.icon && <item.icon className="w-3.5 h-3.5" />}
                                 {item.label}
                             </span>
@@ -110,7 +110,7 @@ export function Breadcrumb({ items, auto = false, separator = "chevron", size = 
 
     if (isBar) {
         return (
-            <div className={`${MAIN_STRONG_COLOR_BG} shadow`}>
+            <div className={`${MAIN_STRONG_COLOR_BG} dark:bg-[#1a1030] dark:shadow-none dark:border-b dark:border-orange-400/15 shadow`}>
                 <div className="px-4 max-w-7xl mx-auto">
                     <div className="flex items-center w-full py-3">{crumbs}</div>
                 </div>
